@@ -212,17 +212,29 @@ You should see:
 
 Visit **http://localhost:8000/docs** to test.
 
-### Deploy to Railway
+### Deploy to Railway (One-Click)
 
-```bash
-# Push to GitHub, then:
-# 1. Create new Railway project
-# 2. Connect your repo
-# 3. Add environment variable: GEMINI_API_KEY=your-key
-# 4. Railway auto-deploys on push
-```
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/new?template=https://github.com/DhanushKenkiri/email-agent-1)
 
-Railway detects Python, installs deps, runs uvicorn. No Dockerfile needed.
+**Or manually:**
+
+1. **Fork/clone this repo** to your GitHub
+2. Go to [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub Repo**
+3. Select your repo
+4. Add environment variable:
+   - `GEMINI_API_KEY` = your Gemini API key
+5. Railway auto-deploys. Done. 🚀
+
+**What happens behind the scenes:**
+- Railway detects Python from `requirements.txt`
+- Installs dependencies automatically
+- Uses `Procfile` to run: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- Assigns a public URL like `your-app.up.railway.app`
+
+**Files included for Railway:**
+- `Procfile` — Tells Railway how to start the app
+- `railway.json` — Railway-specific config
+- `runtime.txt` — Python version (3.11.6)
 
 ---
 
