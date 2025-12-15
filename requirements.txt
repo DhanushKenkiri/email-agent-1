@@ -1,0 +1,23 @@
+# Core web framework
+fastapi>=0.109.0
+uvicorn>=0.27.0
+
+# Data validation (the thing that keeps us sane)
+pydantic>=2.5.0
+
+# HTTP client for scraping
+httpx>=0.26.0
+
+# HTML parsing (turning soup into intel)
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# LLM providers
+google-generativeai>=0.8.0
+
+# Future providers (uncomment when needed)
+# openai>=1.12.0
+# anthropic>=0.18.0
