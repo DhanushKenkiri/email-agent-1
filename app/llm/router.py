@@ -1,7 +1,7 @@
 """
 LLM Router - One router to rule them all.
 
-Right now: Everything goes to Gemini (fast, cheap, good enough).
+Right now: Everything goes to Mistral (fast, cheap, great quality).
 Later: Route by task to the best model for each job.
 
 The agents don't know or care which LLM they're talking to.
@@ -16,7 +16,7 @@ Usage:
 import os
 from typing import Literal
 
-import google.generativeai as genai
+from mistralai import Mistral
 
 
 # Task types we support - add more as needed
@@ -27,7 +27,7 @@ class LLMRouter:
     """
     Routes LLM requests to the appropriate provider.
     
-    Currently: Gemini handles everything.
+    Currently: Mistral handles everything.
     Future: Task-specific routing (Claude for copy, GPT for research, etc.)
     
     Why a class? So we can:
@@ -38,51 +38,53 @@ class LLMRouter:
     """
     
     def __init__(self):
-        self._gemini_configured = False
-        self._gemini_model = None
+        self._mistral_client = None
+        self._mistral_configured = False
         
         # future providers go here
         # self._openai_client = None
         # self._anthropic_client = None
     
-    def _setup_gemini(self) -> None:
+    def _setup_mistral(self) -> None:
         """
-        Initialize Gemini client.
+        Initialize Mistral client.
         
         Lazy loading because:
         1. Don't hit the API until we need to
         2. Easier testing
         3. Faster startup
         """
-        if self._gemini_configured:
+        if self._mistral_configured:
             return
             
-        api_key = os.getenv("GEMINI_API_KEY")
+        api_key = os.getenv("MISTRAL_API_KEY")
         if not api_key:
             raise ValueError(
-                "GEMINI_API_KEY not set. "
-                "Get one at https://makersuite.google.com/app/apikey"
+                "MISTRAL_API_KEY not set. "
+                "Get one at https://console.mistral.ai/api-keys"
             )
         
-        genai.configure(api_key=api_key)
-        
-        # Using gemini-2.5-flash - latest flash model, separate quota bucket
-        # Verified available: gemini-2.0-flash, gemini-2.0-flash-lite, gemini-2.5-flash
-        self._gemini_model = genai.GenerativeModel("gemini-2.5-flash")
-        self._gemini_configured = True
+        self._mistral_client = Mistral(api_key=api_key)
+        self._mistral_configured = True
     
-    def _call_gemini(self, prompt: str) -> str:
+    def _call_mistral(self, prompt: str) -> str:
         """
-        Send prompt to Gemini, get response.
+        Send prompt to Mistral, get response.
         
-        Nothing fancy, just a clean wrapper.
+        Using mistral-small-latest - fast, cheap, great for structured output.
+        Other options: mistral-medium-latest, mistral-large-latest
         """
-        self._setup_gemini()
+        self._setup_mistral()
         
-        response = self._gemini_model.generate_content(prompt)
+        response = self._mistral_client.chat.complete(
+            model="mistral-small-latest",
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
         
-        # Gemini returns a response object, we just want the text
-        return response.text
+        # Mistral returns a response object, we just want the text
+        return response.choices[0].message.content
     
     def generate(self, task: TaskType, prompt: str) -> str:
         """
@@ -106,70 +108,12 @@ class LLMRouter:
         # =============================================
         # ROUTING LOGIC
         # 
-        # Right now: Everything goes to Gemini
+        # Right now: Everything goes to Mistral
         # Later: Uncomment the routing below
         # =============================================
         
-        # --- PHASE 1: Gemini for all (current) ---
-        return self._call_gemini(prompt)
-        
-        # --- PHASE 2: Task-specific routing (future) ---
-        # Uncomment when ready to upgrade:
-        #
-        # if task == "research":
-        #     # Gemini is great at factual summarization
-        #     return self._call_gemini(prompt)
-        #
-        # elif task == "copy":
-        #     # Claude is the king of tone and persuasion
-        #     return self._call_anthropic(prompt)
-        #
-        # elif task == "qa":
-        #     # Fast model for pattern detection
-        #     return self._call_gemini(prompt)
-        #
-        # else:
-        #     # fallback to gemini
-        #     return self._call_gemini(prompt)
-    
-    # =============================================
-    # FUTURE PROVIDERS (scaffolding)
-    # =============================================
-    
-    # def _setup_openai(self) -> None:
-    #     """Initialize OpenAI client."""
-    #     if self._openai_client:
-    #         return
-    #     from openai import OpenAI
-    #     self._openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-    #
-    # def _call_openai(self, prompt: str, model: str = "gpt-4o") -> str:
-    #     """Call OpenAI."""
-    #     self._setup_openai()
-    #     response = self._openai_client.chat.completions.create(
-    #         model=model,
-    #         messages=[{"role": "user", "content": prompt}]
-    #     )
-    #     return response.choices[0].message.content
-    
-    # def _setup_anthropic(self) -> None:
-    #     """Initialize Anthropic client."""
-    #     if self._anthropic_client:
-    #         return
-    #     import anthropic
-    #     self._anthropic_client = anthropic.Anthropic(
-    #         api_key=os.getenv("ANTHROPIC_API_KEY")
-    #     )
-    #
-    # def _call_anthropic(self, prompt: str) -> str:
-    #     """Call Claude."""
-    #     self._setup_anthropic()
-    #     response = self._anthropic_client.messages.create(
-    #         model="claude-3-5-sonnet-20241022",
-    #         max_tokens=2048,
-    #         messages=[{"role": "user", "content": prompt}]
-    #     )
-    #     return response.content[0].text
+        # --- PHASE 1: Mistral for all (current) ---
+        return self._call_mistral(prompt)
 
 
 # Global singleton - import this in your agents

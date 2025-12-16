@@ -16,7 +16,7 @@ lxml>=5.0.0
 python-dotenv>=1.0.0
 
 # LLM providers
-google-generativeai>=0.8.0
+mistralai>=1.0.0
 
 # Future providers (uncomment when needed)
 # openai>=1.12.0

@@ -161,7 +161,7 @@ Yes, things can go wrong. Here's what and why:
 |-------|--------|-----|
 | **Framework** | FastAPI | Async, fast, auto-generates OpenAPI docs |
 | **Validation** | Pydantic v2 | Strict typing, great error messages |
-| **LLM** | Google Gemini | Fast, cheap, good enough for structured output |
+| **LLM** | Mistral AI | Fast, cheap, excellent structured output |
 | **Scraping** | httpx + BeautifulSoup | Async HTTP + reliable HTML parsing |
 | **Deployment** | Railway | One-click deploy, handles everything |
 
@@ -174,7 +174,7 @@ Yes, things can go wrong. Here's what and why:
 ### Prerequisites
 
 - Python 3.10+ (3.11 recommended)
-- Gemini API key ([get one free](https://makersuite.google.com/app/apikey))
+- Mistral API key ([get one free](https://console.mistral.ai/api-keys))
 
 ### Installation
 
@@ -197,8 +197,8 @@ pip install -r requirements.txt
 
 ```bash
 # Set your API key
-set GEMINI_API_KEY=your-key-here      # Windows
-export GEMINI_API_KEY=your-key-here   # macOS/Linux
+set MISTRAL_API_KEY=your-key-here      # Windows
+export MISTRAL_API_KEY=your-key-here   # macOS/Linux
 
 # Start the server
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
@@ -222,7 +222,7 @@ Visit **http://localhost:8000/docs** to test.
 2. Go to [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub Repo**
 3. Select your repo
 4. Add environment variable:
-   - `GEMINI_API_KEY` = your Gemini API key
+   - `MISTRAL_API_KEY` = your Mistral API key
 5. Railway auto-deploys. Done. 🚀
 
 **What happens behind the scenes:**
@@ -240,19 +240,19 @@ Visit **http://localhost:8000/docs** to test.
 
 ## 💰 Rate Limits & Cost Reality
 
-### Gemini Free Tier
-- **15 requests/minute** (per model)
-- **1,500 requests/day**
-- **1M tokens/minute**
+### Mistral Free Tier
+- **1 request/second** (burst up to 5)
+- **500,000 tokens/month**
+- No credit card required
 
 For most use cases, free tier is enough. If you're doing bulk outreach (100+ prospects/day), you'll need a paid tier.
 
 ### Estimated Cost (Paid Tier)
 - ~3 LLM calls per `/run` request
 - ~2,000 tokens per call
-- **Cost per email generation: ~$0.001-0.002**
+- **Cost per email generation: ~$0.0005-0.001**
 
-You can generate ~500 personalized email sets for roughly $1.
+You can generate ~1000 personalized email sets for roughly $1.
 
 ---
 
