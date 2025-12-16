@@ -140,6 +140,19 @@ Interactive API documentation. Try it in browser.
 
 ---
 
+## 🔗 MIP-003 Endpoints (Sokosumi Compatible)
+
+This agent is **MIP-003 compliant** for Masumi/Sokosumi integration:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/availability` | GET | Returns agent availability status |
+| `/input_schema` | GET | Returns expected input format for Sokosumi UI |
+| `/start_job` | POST | Starts a new job (Sokosumi calls this) |
+| `/status?job_id=xxx` | GET | Checks job completion status |
+
+---
+
 ## ❌ Failure Modes
 
 Yes, things can go wrong. Here's what and why:
