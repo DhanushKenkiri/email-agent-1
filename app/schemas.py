@@ -5,7 +5,7 @@ These models keep our API honest. If someone sends garbage in,
 Pydantic yells at them so we don't have to.
 """
 
-from typing import List, Literal
+from typing import List, Literal, Optional
 from pydantic import BaseModel, HttpUrl, Field, field_validator
 
 
@@ -171,3 +171,61 @@ class ErrorResponse(BaseModel):
     error: str
     message: str
     details: List[str] = Field(default_factory=list)
+
+
+# =============================================
+# MIP-003 Compliant Schemas
+# These make Sokosumi happy
+# =============================================
+
+class AvailabilityResponse(BaseModel):
+    """MIP-003: /availability endpoint response."""
+    status: Literal["available", "unavailable"] = "available"
+    type: str = "masumi-agent"
+    message: str = "Cold Outreach Email Agent is ready to accept jobs"
+
+
+class InputFieldSchema(BaseModel):
+    """MIP-003: Input field definition for /input_schema."""
+    id: str
+    type: Literal["string", "number", "boolean", "option", "none"]
+    name: str
+    data: dict = Field(default_factory=dict)
+    validations: List[dict] = Field(default_factory=list)
+
+
+class InputSchemaResponse(BaseModel):
+    """MIP-003: /input_schema endpoint response."""
+    input_data: List[InputFieldSchema]
+
+
+class StartJobRequest(BaseModel):
+    """MIP-003: /start_job request body."""
+    identifier_from_purchaser: str
+    input_data: OutreachInput
+
+
+class StartJobResponse(BaseModel):
+    """MIP-003: /start_job response body."""
+    id: str
+    status: Literal["success", "error"]
+    job_id: str
+    blockchainIdentifier: str
+    payByTime: int
+    submitResultTime: int
+    unlockTime: int
+    externalDisputeUnlockTime: int
+    agentIdentifier: str
+    sellerVKey: str
+    identifierFromPurchaser: str
+    input_hash: str
+
+
+class JobStatusResponse(BaseModel):
+    """MIP-003: /status endpoint response."""
+    id: str
+    job_id: str
+    status: Literal["awaiting_payment", "awaiting_input", "running", "completed", "failed"]
+    result: Optional[str] = None
+    input_schema: Optional[dict] = None
+
